@@ -1,5 +1,5 @@
 # BundleMounter
-Bundlemounter is a mod for Venice Unleashed that allows you to easily mount bundles and superbundles.
+Bundlemounter is a dependency mod for Venice Unleashed that allows you to easily mount bundles and superbundles.
 
 ## Usage:
 
