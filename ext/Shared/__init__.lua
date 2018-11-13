@@ -12,21 +12,12 @@ function BundleMounterShared:RegisterEvents()
 	print("registering events")
 	self.m_ReadInstanceEvent = Events:Subscribe('BundleMounter:LoadBundle', self, self.LoadBundle)
 	self.m_LevelLoadEvent = Events:Subscribe("Level:LoadResources", self, self.OnLoadResources)
-	self.m_PartitionLoadedEvent = Events:Subscribe('Partition:Loaded', self, self.OnPartitionLoaded)
 	Hooks:Install('ResourceManager:LoadBundles',1, self, self.OnLoadBundles)
-	Hooks:Install('ClientEntityFactory:Create', 9, self, self.OnEntityCreate)
+	
 end
-function BundleMounterShared:OnEntityCreate(p_Hook, p_Data, p_Transform)
-	if p_Data == nil then
-		print("Didnt get no data")
-	else
-		--print(p_Data.typeInfo.name)
-	end
-end
+
 function BundleMounterShared:RegisterVars()
 	self.m_Bundles = {}
-	self.m_Registries = {}
-	self.m_MeshVariationEntries = {}
 end
 
 
@@ -82,131 +73,6 @@ end
 
 
 
-function BundleMounterShared:OnPartitionLoaded(p_Partition)
-	if p_Partition == nil then
-		return
-	end
-	
-	local s_Instances = p_Partition.instances
-
-
-	for _, p_Instance in ipairs(s_Instances) do
-		if p_Instance == nil then
-			print('Instance is null?')
-			break
-		end
-		--print(p_Instance.typeInfo.name .. " | " .. tostring(p_Guid))
-		if p_Instance.typeInfo.name == "LevelData" then
-			local s_Instance = LevelData(p_Instance)
-			print("Found LevelData: " .. s_Instance.name)
-
-			if self.m_Bundles ~= nil and self.m_Bundles[s_Instance.name:lower()] == nil then
-				print("Primary level")
-				print("Adding the referenced shit")
-				self.m_PrimaryLevelName = split(s_Instance.name, "/")[2]
-				self:ApplyRegistry(m_vuExtensions:PrepareInstanceForEdit(p_Partition, s_Instance.registryContainer))
-			else
-				if s_Instance.registryContainer ~= nil then
-
-					print("adding the registry from " .. s_Instance.name)
-					self.m_Registries[s_Instance.name] = RegistryContainer(s_Instance.registryContainer)
-					print("Added the registry from " .. s_Instance.name)
-				end
-			end
-		end
-
-		if p_Instance.typeInfo.name == "SubWorldData" then
-			local s_Instance = SubWorldData(p_Instance)
-			print("Found SubWorldData: " .. s_Instance.name)
-
-			if self.m_PrimaryLevelName ~= nil and string.match(s_Instance.name, self.m_PrimaryLevelName) then
-				return
-			end
-			if s_Instance.registryContainer ~= nil then
-				print("Adding the registry from " .. s_Instance.name)
-				self.m_Registries[s_Instance.name] = RegistryContainer(s_Instance.registryContainer) 
-				print("Added the registry from " .. s_Instance.name)
-			end
-		end
-	end
-end
-
-
-function BundleMounterShared:ApplyRegistry(p_Registry)
-	print("Starting to add registry entries.")
-	for l_RegistryName, l_Registry in pairs(self.m_Registries) do
-		print("Loading registry entries from " .. l_RegistryName)
-
-		--Crashing
-		--EntityRegistry
-		--[[
-		local s_EntityCount = l_Registry:GetEntityRegistryCount()
-		print("Loading " .. s_EntityCount .. " entities")
-		for i = 0, s_EntityCount - 1, 1 do
-			local s_RegistryEntry = l_Registry:GetEntityRegistryAt(i)
-			if(s_RegistryEntry ~= nil) then
-				print(s_RegistryEntry.typeInfo.name)
-				p_Registry:AddEntityRegistry(s_RegistryEntry)
-			end
-		end
-		]]
-		--AssetRegistry
-		local s_AssetCount = #l_Registry.assetRegistry
-		print("Loading " .. s_AssetCount .. " assets")
-		for i = 1, s_AssetCount, 1 do
-
-			if(l_Registry.assetRegistry:get(i) == nil) then
-				print("[FATAL!] null refrence")
-			end
-
-			local s_RegistryEntry = Asset(l_Registry.assetRegistry:get(i))
-
-			if(s_RegistryEntry ~= nil) then
-				--print(i)
-				p_Registry.assetRegistry:add(s_RegistryEntry)
-			end
-		end
-
-		--BlueprintRegistry
-		local s_BlueprintRegistryCount = #l_Registry.blueprintRegistry
-		print("Loading " .. s_BlueprintRegistryCount .. " blueprints")
-		for i = 1, s_BlueprintRegistryCount, 1 do
-			if(l_Registry.blueprintRegistry:get(i) == nil) then
-				print("[FATAL!] null refrence")
-			end
-			local s_RegistryEntry = l_Registry.blueprintRegistry:get(i)
-			if(s_RegistryEntry ~= nil) then
-				--print(i)
-				p_Registry.blueprintRegistry:add(s_RegistryEntry)
-			end
-		end
-
-		--
-		--ReferenceObjectRegistry
-		
-		local s_ReferenceObjectRegistryCount = #l_Registry.referenceObjectRegistry
-		print("Loading " .. s_ReferenceObjectRegistryCount .. " referenceObjects")
-		for i = 0, s_ReferenceObjectRegistryCount - 1, 1 do
-			local s_RegistryEntry = l_Registry.referenceObjectRegistry:get(i)
-			if(s_RegistryEntry ~= nil) then
-				p_Registry.referenceObjectRegistry:add(s_RegistryEntry)
-			end
-		end
-		
-	end
-	print("Errything is loaded yo!")
-
-end
-
--- util 
-function IsPrimaryLevel( p_Bundle )
-	local s_Path = split(p_Bundle, "/")
-	if s_Path[2] == s_Path[3] then
-		return true
-	end
-
-	return false
-end
 function TableConcat(t1,t2)
     for i=1,#t2 do
         t1[#t1+1] = t2[i]
