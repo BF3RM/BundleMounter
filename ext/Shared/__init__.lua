@@ -71,7 +71,13 @@ function BundleMounterShared:LoadBundle(p_SuperBundle, p_Bundles)
 	self.m_Bundles[p_SuperBundle:lower()] = p_Bundles
 end
 
-
+function IsPrimaryLevel( p_Bundle )
+	local s_Path = split(p_Bundle, "/")
+	if s_Path[2] == s_Path[3] then
+		return true
+	end
+ 	return false
+end
 
 function TableConcat(t1,t2)
     for i=1,#t2 do
