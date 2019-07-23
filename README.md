@@ -16,7 +16,7 @@ function MyMod:OnLoadBundles(p_Hook, p_Bundles, p_Compartment)
   if(p_Bundles[1] == "gameconfigurations/game" or p_Bundles[1] == "UI/Flow/Bundle/LoadingBundleMp") then 
   -- Mount your superbundle and bundles..
   
-    Events:Dispatch('BundleMounter:LoadBundle', 'levels/sp_paris/sp_paris', {
+    Events:Dispatch('BundleMounter:LoadBundles', 'levels/sp_paris/sp_paris', {
       "levels/sp_paris/heat_pc_only",
       "levels/sp_paris/sp_paris",
       "levels/sp_paris/chase",

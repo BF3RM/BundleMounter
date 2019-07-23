@@ -10,10 +10,9 @@ end
 
 function BundleMounterShared:RegisterEvents()
 	print("registering events")
-	self.m_ReadInstanceEvent = Events:Subscribe('BundleMounter:LoadBundle', self, self.LoadBundle)
+	self.m_ReadInstanceEvent = Events:Subscribe('BundleMounter:LoadBundles', self, self.LoadBundles)
 	self.m_LevelLoadEvent = Events:Subscribe("Level:LoadResources", self, self.OnLoadResources)
 	Hooks:Install('ResourceManager:LoadBundles',1, self, self.OnLoadBundles)
-	
 end
 
 function BundleMounterShared:RegisterVars()
@@ -50,8 +49,7 @@ function BundleMounterShared:OnLoadResources(p_Dedicated)
 	end
 end
 
-
-function BundleMounterShared:LoadBundle(p_SuperBundle, p_Bundles) 
+function BundleMounterShared:LoadBundles(p_SuperBundle, p_Bundles) 
 	print("Loading: ")
 	print(p_SuperBundle)
 	print(p_Bundles)
@@ -68,7 +66,10 @@ function BundleMounterShared:LoadBundle(p_SuperBundle, p_Bundles)
 		table.insert(p_Bundles, p_SuperBundle)
 	end
 	print("Added bundles:" .. p_SuperBundle .. ": " .. dump(p_Bundles))
-	self.m_Bundles[p_SuperBundle:lower()] = p_Bundles
+
+	for _, s_Bundle in pairs(p_Bundles) do
+		table.insert(self.m_Bundles[p_SuperBundle:lower()], s_Bundle)
+	end
 end
 
 function IsPrimaryLevel( p_Bundle )
