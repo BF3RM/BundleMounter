@@ -4,29 +4,13 @@ Bundlemounter is a dependency mod for Venice Unleashed that allows you to easily
 ## Usage:
 
 ```lua
-function MyMod:RegisterEvents()
--- Subscribe to the LoadBundles hook
-  Hooks:Install('ResourceManager:LoadBundles',999, self, self.OnLoadBundles) 
-end
-
-
-function MyMod:OnLoadBundles(p_Hook, p_Bundles, p_Compartment)
-
--- Catch the earliest possible bundle. Both server & client.
-  if(p_Bundles[1] == "gameconfigurations/game" or p_Bundles[1] == "UI/Flow/Bundle/LoadingBundleMp") then 
-  -- Mount your superbundle and bundles..
-  
-    Events:Dispatch('BundleMounter:LoadBundles', 'levels/sp_paris/sp_paris', {
-      "levels/sp_paris/heat_pc_only",
-      "levels/sp_paris/sp_paris",
-      "levels/sp_paris/chase",
-      "levels/sp_paris/loweroffice",
-      "levels/sp_paris/loweroffice_pc"
-    })
-  end
-end
-
--- And you're done.
+Events:Subscribe('BundleMounter:RegisterBundles', function(info)
+  Events:Dispatch('BundleMounter:LoadBundle', 'Levels/XP4_Quake/XP4_Quake', {
+    'Levels/XP4_Quake/XP4_Quake',
+    'Levels/XP4_Quake/DeathMatch',
+    'Levels/XP4_Quake/SquadDeathMatch',
+})
+end)
 ```
 
 BundleMounter will automatically register the content into the current level.

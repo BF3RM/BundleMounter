@@ -1,7 +1,5 @@
 class 'BundleMounterShared'
 
-local m_vuExtensions = require "__shared/VUExtensions"
-
 function BundleMounterShared:__init()
 	print("Initializing BundleMounterShared")
 	self:RegisterEvents()
@@ -13,15 +11,44 @@ function BundleMounterShared:RegisterEvents()
 	self.m_ReadInstanceEvent = Events:Subscribe('BundleMounter:LoadBundles', self, self.LoadBundles)
 	self.m_LevelLoadEvent = Events:Subscribe("Level:LoadResources", self, self.OnLoadResources)
 	Hooks:Install('ResourceManager:LoadBundles',1, self, self.OnLoadBundles)
+	Events:Subscribe('Partition:Loaded', self, self.OnPartitionLoaded)
+end
+
+function BundleMounterShared:OnPartitionLoaded(p_Partition)
+	if p_Partition == nil then
+		return
+	end
+	
+	local s_Instances = p_Partition.instances
+	for _, l_Instance in ipairs(s_Instances) do
+		if l_Instance == nil then
+			print('Instance is null?')
+			break
+		end
+		if(l_Instance.typeInfo.name == "RegistryContainer" and not string.match(p_Partition.name, self.m_PrimaryLevel)) then
+			print("Adding registry")
+			ResourceManager:AddRegistry(l_Instance, ResourceCompartment.ResourceCompartment_Game)
+		end
+	end
 end
 
 function BundleMounterShared:RegisterVars()
 	self.m_Bundles = {}
+	self.m_PrimaryLevel = nil
+
 end
 
 
 function BundleMounterShared:OnLoadBundles(p_Hook, p_Bundles, p_Compartment)
+	if(p_Bundles[1] == "gameconfigurations/game" or p_Bundles[1] == "UI/Flow/Bundle/LoadingBundleMp") then
+		print("Loading")
+		Events:Dispatch('BundleMounter:RegisterBundles')
+	end
+	print("LoadBundles")
+	Events:Dispatch('BundleMounter:GetBundles', true)
+	print("LEGO")
 	 if #p_Bundles == 1 and IsPrimaryLevel(p_Bundles[1]) then
+	 	self.m_PrimaryLevel = p_Bundles[1]
  		print("Modifying bundles")
 		local s_Bundles = {}
 		for l_Superbundle, l_BundleArray in pairs(self.m_Bundles) do
@@ -35,7 +62,6 @@ function BundleMounterShared:OnLoadBundles(p_Hook, p_Bundles, p_Compartment)
 end
 
 function BundleMounterShared:OnLoadResources(p_Dedicated)
-	print("Loading shit yo")
 	if(self.m_Bundles ~= nil) then
 		print("Loading bundles: " .. dump( self.m_Bundles ))
 	end
@@ -45,6 +71,7 @@ function BundleMounterShared:OnLoadResources(p_Dedicated)
 	end
 
 	for l_Superbundle, l_BundleArray in pairs(self.m_Bundles) do
+		print("Mounting superbundle " .. l_Superbundle)
 		ResourceManager:MountSuperBundle(l_Superbundle)
 	end
 end
@@ -52,7 +79,6 @@ end
 function BundleMounterShared:LoadBundles(p_SuperBundle, p_Bundles) 
 	print("Loading: ")
 	print(p_SuperBundle)
-	print(p_Bundles)
 	if(self.m_Bundles == nil) then
 		self.m_Bundles = {}
 	end
@@ -61,12 +87,11 @@ function BundleMounterShared:LoadBundles(p_SuperBundle, p_Bundles)
 	-- Meaning that Levels\coop_003\coop_003 MUST be loaded before Levels\coop_003\WhateverBundle
 
 	if(inTable(p_Bundles, p_SuperBundle) or split(p_SuperBundle, "/")[2] == nil) then
-		print("We already have the core one")
+		-- print("We already have the core bundle")
 	else 
 		table.insert(p_Bundles, p_SuperBundle)
 	end
 	print("Added bundles:" .. p_SuperBundle .. ": " .. dump(p_Bundles))
-
 	for _, s_Bundle in pairs(p_Bundles) do
 		table.insert(self.m_Bundles[p_SuperBundle:lower()], s_Bundle)
 	end
