@@ -8,8 +8,8 @@ end
 
 function BundleMounterShared:RegisterEvents()
 	print("registering events")
-	self.m_ReadInstanceEvent = Events:Subscribe('BundleMounter:LoadBundles', self, self.LoadBundles)
-	self.m_LevelLoadEvent = Events:Subscribe("Level:LoadResources", self, self.OnLoadResources)
+	Events:Subscribe('BundleMounter:LoadBundles', self, self.LoadBundles)
+	Events:Subscribe("Level:LoadResources", self, self.OnLoadResources)
 	Hooks:Install('ResourceManager:LoadBundles',1, self, self.OnLoadBundles)
 	Events:Subscribe('Partition:Loaded', self, self.OnPartitionLoaded)
 end
@@ -40,11 +40,6 @@ end
 
 
 function BundleMounterShared:OnLoadBundles(p_Hook, p_Bundles, p_Compartment)
-	if(p_Bundles[1] == "gameconfigurations/game" or p_Bundles[1] == "UI/Flow/Bundle/LoadingBundleMp") then
-		print("Loading")
-		Events:Dispatch('BundleMounter:RegisterBundles')
-	end
-	print("LoadBundles")
 	Events:Dispatch('BundleMounter:GetBundles', true)
 	print("LEGO")
 	 if #p_Bundles == 1 and IsPrimaryLevel(p_Bundles[1]) then
@@ -82,6 +77,9 @@ function BundleMounterShared:LoadBundles(p_SuperBundle, p_Bundles)
 	if(self.m_Bundles == nil) then
 		self.m_Bundles = {}
 	end
+	if(self.m_Bundles[p_SuperBundle:lower()] == nil) then
+		self.m_Bundles[p_SuperBundle:lower()] = {}
+	end
 	-- TODO:
 	-- Make sure the primary bundle is loaded before secondary.
 	-- Meaning that Levels\coop_003\coop_003 MUST be loaded before Levels\coop_003\WhateverBundle
@@ -93,7 +91,11 @@ function BundleMounterShared:LoadBundles(p_SuperBundle, p_Bundles)
 	end
 	print("Added bundles:" .. p_SuperBundle .. ": " .. dump(p_Bundles))
 	for _, s_Bundle in pairs(p_Bundles) do
-		table.insert(self.m_Bundles[p_SuperBundle:lower()], s_Bundle)
+		if(inTable(self.m_Bundles[p_SuperBundle:lower()], s_Bundle)) then
+			-- Already added to table
+		else
+			table.insert(self.m_Bundles[p_SuperBundle:lower()], s_Bundle)
+		end
 	end
 end
 
