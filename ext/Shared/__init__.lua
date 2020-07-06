@@ -7,7 +7,6 @@ function BundleMounterShared:__init()
 end
 
 function BundleMounterShared:RegisterEvents()
-	print("registering events")
 	Events:Subscribe('BundleMounter:LoadBundles', self, self.LoadBundles)
 	Events:Subscribe("Level:LoadResources", self, self.OnLoadResources)
 	Hooks:Install('ResourceManager:LoadBundles',1, self, self.OnLoadBundles)
