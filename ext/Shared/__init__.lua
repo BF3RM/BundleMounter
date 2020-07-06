@@ -24,7 +24,7 @@ function BundleMounterShared:OnPartitionLoaded(p_Partition)
 			print('Instance is null?')
 			break
 		end
-		if(l_Instance.typeInfo.name == "RegistryContainer" and not string.match(p_Partition.name, self.m_PrimaryLevel)) then
+		if(l_Instance.typeInfo.name == "RegistryContainer" and not string.match(p_Partition.name:lower(), split(self.m_PrimaryLevel:lower(), "/")[2])) then
 			print("Adding registry: " .. l_Instance.partition.name)
 			ResourceManager:AddRegistry(l_Instance, ResourceCompartment.ResourceCompartment_Game)
 		end
