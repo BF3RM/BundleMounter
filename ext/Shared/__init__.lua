@@ -26,7 +26,7 @@ function BundleMounterShared:OnPartitionLoaded(p_Partition)
 			break
 		end
 		if(l_Instance.typeInfo.name == "RegistryContainer" and not string.match(p_Partition.name, self.m_PrimaryLevel)) then
-			print("Adding registry")
+			print("Adding registry: " .. l_Instance.partition.name)
 			ResourceManager:AddRegistry(l_Instance, ResourceCompartment.ResourceCompartment_Game)
 		end
 	end
@@ -41,30 +41,20 @@ end
 
 function BundleMounterShared:OnLoadBundles(p_Hook, p_Bundles, p_Compartment)
 	Events:Dispatch('BundleMounter:GetBundles', true)
-	print("LEGO")
 	 if #p_Bundles == 1 and IsPrimaryLevel(p_Bundles[1]) then
 	 	self.m_PrimaryLevel = p_Bundles[1]
- 		print("Modifying bundles")
 		local s_Bundles = {}
 		for l_Superbundle, l_BundleArray in pairs(self.m_Bundles) do
 			s_Bundles = TableConcat(s_Bundles, l_BundleArray)
 		end
         s_Bundles[#s_Bundles + 1] = p_Bundles[1]
-        
+        print("Loading bundles:")
         print(s_Bundles)
         p_Hook:Pass(s_Bundles, p_Compartment)
     end
 end
 
 function BundleMounterShared:OnLoadResources(p_Dedicated)
-	if(self.m_Bundles ~= nil) then
-		print("Loading bundles: " .. dump( self.m_Bundles ))
-	end
-
-	for l_Superbundle, l_Bundles in ipairs(self.m_Bundles) do
-		print(l_Superbundle .. " | " .. l_Bundles)
-	end
-
 	for l_Superbundle, l_BundleArray in pairs(self.m_Bundles) do
 		print("Mounting superbundle " .. l_Superbundle)
 		ResourceManager:MountSuperBundle(l_Superbundle)
@@ -72,8 +62,6 @@ function BundleMounterShared:OnLoadResources(p_Dedicated)
 end
 
 function BundleMounterShared:LoadBundles(p_SuperBundle, p_Bundles) 
-	print("Loading: ")
-	print(p_SuperBundle)
 	if(self.m_Bundles == nil) then
 		self.m_Bundles = {}
 	end
@@ -89,7 +77,6 @@ function BundleMounterShared:LoadBundles(p_SuperBundle, p_Bundles)
 	else 
 		table.insert(p_Bundles, p_SuperBundle)
 	end
-	print("Added bundles:" .. p_SuperBundle .. ": " .. dump(p_Bundles))
 	for _, s_Bundle in pairs(p_Bundles) do
 		if(inTable(self.m_Bundles[p_SuperBundle:lower()], s_Bundle)) then
 			-- Already added to table
