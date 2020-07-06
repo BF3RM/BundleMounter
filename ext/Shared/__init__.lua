@@ -39,7 +39,7 @@ end
 
 
 function BundleMounterShared:OnLoadBundles(p_Hook, p_Bundles, p_Compartment)
-	Events:Dispatch('BundleMounter:GetBundles', true)
+	Events:Dispatch('BundleMounter:GetBundles', self.m_Bundles)
 	 if #p_Bundles == 1 and IsPrimaryLevel(p_Bundles[1]) then
 	 	self.m_PrimaryLevel = p_Bundles[1]
 		local s_Bundles = {}
