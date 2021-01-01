@@ -5,6 +5,13 @@ It was created so several mods can load different bundles without conflicts.
 ## Usage:
 
 ```lua
+
+Events:Subscribe('BundleMounter:GetBundles', function(bundles)
+    Events:Dispatch('BundleMounter:LoadBundles', SuperBundle, {
+        Bundles...
+    })
+end)
+-- Example:
 Events:Subscribe('BundleMounter:GetBundles', function(bundles)
   Events:Dispatch('BundleMounter:LoadBundles', 'Levels/XP4_Quake/XP4_Quake', {
     'Levels/XP4_Quake/XP4_Quake',
