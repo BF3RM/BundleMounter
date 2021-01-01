@@ -16,4 +16,4 @@ end)
 
 BundleMounter will automatically register the content into the current level.
 
-You can find a list of superbundles and bundles in the [Venice Unleashed Docs](https://docs.veniceunleashed.net/vext/bundles/9) and search through the bundle contents [here](https://github.com/Powback/VU-Wiki/tree/master/Bundles/)
+You can find a list of superbundles and bundles in the [Venice Unleashed Docs](https://docs.veniceunleashed.net/vext/bundles/) and search through the bundle contents [here](https://github.com/Powback/VU-Wiki/tree/master/Bundles/)
